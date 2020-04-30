@@ -75,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                // TODO Auto-generated method stub
 
                 while (isRunning) {
                     try {
@@ -85,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
 
                             @Override
                             public void run() {
-                                // TODO Auto-generated method stub
                                 // Write your code here to update the UI.
                                 try {
                                     if(errMessage.getVisibility()==View.VISIBLE && errMessage.getText()=="Connected witch Internet"){
@@ -100,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
                             }
                         });
                     } catch (Exception e) {
-                        // TODO: handle exception
                     }
                 }
             }
