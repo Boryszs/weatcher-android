@@ -1,30 +1,24 @@
 package com.example.lab7;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Context;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.squareup.picasso.Picasso;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class WeatherActivity extends AppCompatActivity implements Runnable{
+public class WeatherActivity extends AppCompatActivity{
 
     private String zoneT=new String("");
     private TextView textView;
@@ -35,6 +29,11 @@ public class WeatherActivity extends AppCompatActivity implements Runnable{
     private TextView textHumidity;
     private TextView textTempMin;
     private TextView textTempMax;
+    private TextView errMesge;
+    private SwipeRefreshLayout swipeRefresh;
+    private  String city;
+    boolean timeBoolean;
+    boolean dateBoolean;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +42,9 @@ public class WeatherActivity extends AppCompatActivity implements Runnable{
 
         //Receive date
         Intent intent=getIntent();
-        String city=intent.getStringExtra("City");
-
+        city=intent.getStringExtra("City");
+        timeBoolean=true;
+        dateBoolean=true;
         //Atribution items to variable
         textView=findViewById(R.id.name_city);
         textTime=findViewById(R.id.time);
@@ -55,11 +55,23 @@ public class WeatherActivity extends AppCompatActivity implements Runnable{
         textTempMax=findViewById(R.id.tempMax);
         imageView=findViewById(R.id.imageView2);
 
-        //Strat Method
-        show(city);
-        start();
 
+
+        //Strat Method
+       show();
+       start();
+
+        swipeRefresh = findViewById(R.id.spread_inside);
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                show();
+                swipeRefresh.setRefreshing(false);
+            }
+        });
     }
+
+
 
     //Method show time  witch timezZone include a JSON information
     public void showTime(){
@@ -67,7 +79,7 @@ public class WeatherActivity extends AppCompatActivity implements Runnable{
     }
 
     //Method show information about city
-    public void show(final String city){
+    public void show(){
 
 
         Retrofit retrofit=new Retrofit.Builder()
@@ -139,19 +151,41 @@ public class WeatherActivity extends AppCompatActivity implements Runnable{
 
     //Method create and start Thread
     public void start() {
-        Thread thread = new Thread(this);
-        thread.start();
-    }
-    //Method service Thread
-    public void run() {
-        while (true) {
-            showTime();
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+
+        //Refresh time clock whhat one second
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (timeBoolean) {
+
+                    try {
+                        Thread.sleep(100);
+                        showTime();
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
-        }
+        });
+
+        //Refresh date city what five minute
+        Thread thread1 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (dateBoolean) {
+
+                    try {
+                        Thread.sleep(300000);
+                        show();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        thread.start();
+        thread1.start();
     }
 
 }

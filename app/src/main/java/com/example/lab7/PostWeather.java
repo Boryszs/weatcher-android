@@ -1,5 +1,6 @@
 package com.example.lab7;
 
+
 import java.util.ArrayList;
 
 public class PostWeather {
